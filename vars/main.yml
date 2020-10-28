@@ -1,0 +1,5 @@
+---
+
+k8s_docker_packages: [ docker-ce, docker-ce-cli, containerd.io ]
+k8s_kubernetes_packages: [ kubelet, kubeadm, kubectl, python3-pip ]
+k8s_pip_requirements: openshift

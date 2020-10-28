@@ -1,0 +1,12 @@
+---
+
+- name: mkdir ~/.kube directory
+  file:
+    path: ~/.kube
+    state: directory
+
+- name: symlink admin.conf to ~/.kube/config
+  file:
+    src: /etc/kubernetes/admin.conf
+    dest: ~/.kube/config
+    state: link

@@ -1,0 +1,43 @@
+---
+
+- name: add docker repo
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+
+- name: install k8s_docker_packages
+  package:
+    name: '{{ k8s_docker_packages }}'
+
+- name: load br_netfilter
+  modprobe:
+    name: br_netfilter
+
+#  cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+#  net.bridge.bridge-nf-call-ip6tables = 1
+#  net.bridge.bridge-nf-call-iptables = 1
+#  EOF
+#  sudo sysctl --system
+
+- name: add k8s repo
+  copy:
+    src: kubernetes.repo
+    dest: /etc/yum.repos.d/kubernetes.repo
+
+- name: install k8s_kubernetes_packages
+  package:
+    name: '{{ k8s_kubernetes_packages }}'
+    disable_excludes: kubernetes
+
+- name: install k8s_pip_requirements
+  pip:
+    name: '{{ k8s_pip_requirements }}'
+    executable: pip3
+  when: inventory_hostname in groups ['k8s_master']
+
+- name: enable and start kubelet and docker
+  systemd:
+    name: '{{ item }}'
+    enabled: yes
+    state: started
+  loop: [ kubelet, docker ]
